@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FieldType } from '@/types/survey';
 import { createNewField } from '@/utils/surveyUtils';
 import { useSurvey } from '@/context/SurveyContext';
-import { Input, Textarea, Radio, Checkbox, Calendar } from 'lucide-react';
+import { Type, AlignLeft, CircleDot, CheckSquare, Calendar } from 'lucide-react';
 
 interface FieldTypeOption {
   type: FieldType;
@@ -14,10 +14,10 @@ interface FieldTypeOption {
 }
 
 const fieldTypes: FieldTypeOption[] = [
-  { type: 'input', label: 'Text Input', icon: Input },
-  { type: 'textarea', label: 'Text Area', icon: Textarea },
-  { type: 'radio', label: 'Radio Buttons', icon: Radio },
-  { type: 'checkbox', label: 'Checkboxes', icon: Checkbox },
+  { type: 'input', label: 'Text Input', icon: Type },
+  { type: 'textarea', label: 'Text Area', icon: AlignLeft },
+  { type: 'radio', label: 'Radio Buttons', icon: CircleDot },
+  { type: 'checkbox', label: 'Checkboxes', icon: CheckSquare },
   { type: 'date', label: 'Date Picker', icon: Calendar },
 ];
 
