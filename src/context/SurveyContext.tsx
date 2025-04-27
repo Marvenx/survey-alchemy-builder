@@ -52,7 +52,7 @@ export const SurveyProvider: React.FC<SurveyProviderProps> = ({ children }) => {
       ...prev,
       fields: prev.fields.map(field => 
         field.id === fieldId ? { ...field, ...updatedField } : field
-      ),
+      ) as SurveyField[],
     }));
   };
 
@@ -102,7 +102,7 @@ export const SurveyProvider: React.FC<SurveyProviderProps> = ({ children }) => {
         parsedSurvey !== null &&
         Array.isArray(parsedSurvey.fields)
       ) {
-        setSurvey(parsedSurvey);
+        setSurvey(parsedSurvey as Survey);
         setSelectedFieldId(null);
         toast.success("Survey imported successfully");
       } else {
