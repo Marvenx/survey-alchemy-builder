@@ -1,5 +1,5 @@
 
-import { FieldType, SurveyField, Option } from "@/types/survey";
+import { FieldType, SurveyField, Option, InputField, TextareaField, ChoiceField, DateField } from "@/types/survey";
 
 // Generate a unique ID
 export const generateId = (): string => {
@@ -10,7 +10,6 @@ export const generateId = (): string => {
 export const createNewField = (type: FieldType): SurveyField => {
   const baseField = {
     id: generateId(),
-    type,
     question: '',
     required: false,
   };
@@ -19,32 +18,41 @@ export const createNewField = (type: FieldType): SurveyField => {
     case 'input':
       return {
         ...baseField,
-        type,
+        type: 'input',
         placeholder: '',
-      };
+      } as InputField;
     case 'textarea':
       return {
         ...baseField,
-        type,
+        type: 'textarea',
         placeholder: '',
         rows: 3,
-      };
+      } as TextareaField;
     case 'radio':
-    case 'checkbox':
       return {
         ...baseField,
-        type,
+        type: 'radio',
         options: [
           { id: generateId(), label: 'Option 1' },
         ],
-      };
+      } as ChoiceField;
+    case 'checkbox':
+      return {
+        ...baseField,
+        type: 'checkbox',
+        options: [
+          { id: generateId(), label: 'Option 1' },
+        ],
+      } as ChoiceField;
     case 'date':
       return {
         ...baseField,
-        type,
-      };
+        type: 'date',
+      } as DateField;
     default:
-      return baseField as SurveyField;
+      // This is a TypeScript guard to ensure all types are handled
+      const _exhaustiveCheck: never = type;
+      throw new Error(`Unhandled field type: ${type}`);
   }
 };
 
