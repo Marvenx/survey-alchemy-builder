@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useSurvey } from '@/context/SurveyContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -20,9 +20,18 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 
 const SurveyPreview: React.FC = () => {
   const { survey, selectedFieldId, setSelectedFieldId } = useSurvey();
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [formValues, setFormValues] = useState<Record<string, any>>({});
 
   const handleFieldClick = (fieldId: string) => {
     setSelectedFieldId(fieldId);
+  };
+
+  const handleInputChange = (fieldId: string, value: any) => {
+    setFormValues(prev => ({
+      ...prev,
+      [fieldId]: value
+    }));
   };
 
   return (
@@ -57,7 +66,8 @@ const SurveyPreview: React.FC = () => {
               {field.type === 'input' && (
                 <Input
                   placeholder={field.placeholder || "Enter text"}
-                  disabled
+                  value={formValues[field.id] || ''}
+                  onChange={(e) => handleInputChange(field.id, e.target.value)}
                 />
               )}
 
@@ -65,16 +75,20 @@ const SurveyPreview: React.FC = () => {
                 <Textarea
                   placeholder={field.placeholder || "Enter text"}
                   rows={field.rows || 3}
-                  disabled
+                  value={formValues[field.id] || ''}
+                  onChange={(e) => handleInputChange(field.id, e.target.value)}
                 />
               )}
 
               {field.type === 'radio' && (
-                <RadioGroup disabled>
+                <RadioGroup
+                  value={formValues[field.id] || ''}
+                  onValueChange={(value) => handleInputChange(field.id, value)}
+                >
                   {field.options.map((option) => (
                     <div key={option.id} className="flex items-center space-x-2">
-                      <RadioGroupItem value={option.id} id={option.id} />
-                      <Label htmlFor={option.id}>{option.label}</Label>
+                      <RadioGroupItem value={option.id} id={`${field.id}-${option.id}`} />
+                      <Label htmlFor={`${field.id}-${option.id}`}>{option.label}</Label>
                     </div>
                   ))}
                 </RadioGroup>
@@ -84,8 +98,18 @@ const SurveyPreview: React.FC = () => {
                 <div className="space-y-2">
                   {field.options.map((option) => (
                     <div key={option.id} className="flex items-center space-x-2">
-                      <Checkbox id={option.id} disabled />
-                      <Label htmlFor={option.id}>{option.label}</Label>
+                      <Checkbox 
+                        id={`${field.id}-${option.id}`} 
+                        checked={(formValues[field.id] || []).includes(option.id)}
+                        onCheckedChange={(checked) => {
+                          const currentValues = formValues[field.id] || [];
+                          const newValues = checked 
+                            ? [...currentValues, option.id]
+                            : currentValues.filter((id: string) => id !== option.id);
+                          handleInputChange(field.id, newValues);
+                        }}
+                      />
+                      <Label htmlFor={`${field.id}-${option.id}`}>{option.label}</Label>
                     </div>
                   ))}
                 </div>
@@ -97,16 +121,21 @@ const SurveyPreview: React.FC = () => {
                     <Button
                       variant="outline"
                       className="w-full justify-start text-left font-normal"
-                      disabled
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      <span>Pick a date</span>
+                      <span>
+                        {formValues[field.id] 
+                          ? format(new Date(formValues[field.id]), 'PPP') 
+                          : "Pick a date"}
+                      </span>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      className="p-3 pointer-events-auto"
+                      selected={formValues[field.id] ? new Date(formValues[field.id]) : undefined}
+                      onSelect={(date) => handleInputChange(field.id, date)}
+                      className="p-3"
                     />
                   </PopoverContent>
                 </Popover>
